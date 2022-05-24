@@ -1,6 +1,6 @@
 +++ title = "A Unified Theory of Garbage Collection" [[extra.authors]] name =
 "Orko Sinha" link = "" [[extra.authors]] name = "Michael Maitland" link =
-"https://michaelmaitland.com"
+"https://michaelmaitland.com" latex = true
 
 +++
 
@@ -16,6 +16,7 @@ tracing and reference counting, and develops a cost analysis is provided to
 determine the time and space tradeoffs of collectors within this design space.
 
 # Background
+
 ## Garbage Collection
 Languages like C and C++ take a manual memory management approach, requiring
 programmers to explicitly allocate and deallocate memory using `malloc` and
@@ -26,8 +27,8 @@ used by the programmer. This approach however comes at a runtime cost since the
 language must be able to keep track of which objects are no longer being used.
 This has led to the research of high performance garbage collectors. There are
 two main types of collectors: reference counting collectors and tracing
-collectors. Until the ideas in this paper were presented, it was believed that
-they were seperate algorithms that accomplished the same task.
+collectors. Until the ideas in this paper were presented, the two can seem 
+like unrelated algorithms that accomplished the same task.
 
 ## Reference Counting
 
@@ -85,7 +86,7 @@ given as a fixed point computation.
 Once reference counts have been assigned, verticies with counts of 0 are
 reclaimed. It is important to note that this fixed point equation is not an
 algorithm. Instead, tracing, reference counting, and hybrids of the two are
-algorithms that satisfy this fixed point equation.
+algorithms that find solutions that satisfy this fixed point equation.
 
 ## Algorithmic Duals
 
@@ -107,12 +108,12 @@ below.
 </p>
 
 Tracing initially sets the reference counts of all objects to 0 and initializes
-the worklist to be the root set $R$. The $scan-by-tracing()$ function scans
+the worklist to be the root set $R$. The `scan-by-tracing()` function scans
 through the worklist and increments the reference counts of the objects it
 encounters, and adds all of the objects referenced by it to the worklist to be
 recursivley processed as well. When this function terminates, the reference
 counts for live objects will have non-zero counts and all other objects will
-have a count of zero. From here the $sweep-for-tracing()$ function can free all
+have a count of zero. From here the `sweep-for-tracing()` function can free all
 objects of count zero so their memory can be reused.
 
 Reference counting need not do any initialization work at the start of the
@@ -122,15 +123,15 @@ object is assigned to a pointer, the reference count of the object is
 incremented by one since a pointer now has a reference to it, and the object
 that was previously referenced by that pointer, if any, is added to the worklist
 to have its count decremented by one since the pointer no longer references it.
-The $scan-by-counting()$ function processes this  worklist of objects who need
+The `scan-by-counting()` function processes this  worklist of objects who need
 to have their count decremented by one and recursivley adds objects it
 references to the worklist, similiar to the tracing algorithm. The
-$sweep-for-counting()$ function acts exactly like the one for tracing, as it
+`sweep-for-counting()` function acts exactly like the one for tracing, as it
 frees all objects of count zero so their memory can be reused.
 
 It is important to note that when we want to decrement the count of an object,
 we delay the actual decrement operation by placing it in a worklist so that it
-is decremented in the $sweep-for-counting()$ function. In a real world
+is decremented in the `sweep-for-counting()` function. In a real world
 implementation this may seem silly, but it is structured in this way to show the
 relationship between tracing and reference counting as duals. The actual
 complexity of the algorithm remains the same between both versions.
@@ -153,7 +154,7 @@ differences hilighted in the previous paragraph.
 
 ## Deferred Reference Counting vs Partial Tracing
 In making optimizations to the traditional methods of garbage collection such as
-reference counting and tracing, we have deferred reference counting and, its
+reference counting and tracing, we have deferred reference counting and its
 converse, partial tracing. In deferred reference counting we maintain a Zero
 Count Table (ZCT) which maintains objects with reference count 0. We also save
 some overhead in not counting mutations to root references. At collection time,
@@ -207,9 +208,9 @@ reference counting differently.
 ## Cycle Collection
 
 One of the key disadvantages of reference counting is the lack of cycle
-collection. The authors propose two solutions, one is to run reference counting
+collection. The authors propose two solutions: (1) run reference counting
 without cycle collection, and occasionally run a tracing algorithm to detect
-cycles. The other solution proposed was reference counting with trial deletion.
+cycles, or (2) use reference counting with trial deletion.
 In this algorithm, objects with suspiciouslly high references are traced to
 check for cycles. 
 
